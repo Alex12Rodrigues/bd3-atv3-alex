@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Alunos - FIREBASE</title>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <h1>Cadastro de Alunos - Firestore</h1>
+    <div class="content">
+        <form id="add-student-form">
+            <input type="text" name="nome" placeholder="Nome completo" maxlength="100" required>
+            <input type="text" name="cpf" placeholder="CPF" maxlength="14" required>
+            <input type="text" name="rg" placeholder="RG" maxlength="12" required>
+            <input type="text" name="telefone_aluno" placeholder="Telefone do Aluno" maxlength="15" required>
+            <input type="text" name="telefone_responsavel" placeholder="Telefone do Responsável" maxlength="15">
+            <input type="email" name="email" placeholder="Email" maxlength="100" required>
+            <input type="date" name="data_nascimento" placeholder="Data de Nascimento" required>
+            <button>Cadastrar</button>
+        </form>
+        <ul id="student-list"></ul>
+    </div>
+
+</body>
+
+<!-- SDK DO FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/5.0.3/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.0.3/firebase-firestore.js"></script>
+
+<!-- CONEXÃO COM O FIREBASE -->
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyD4H1lAw2e62TYE_K0ET8n6faVYMueswO8",
+        authDomain: "app-libri-alex.firebaseapp.com",
+        projectId: "app-libri-alex",
+        storageBucket: "app-libri-alex.appspot.com",
+        messagingSenderId: "684727502758",
+        appId: "1:684727502758:web:7b99cd866823a846a6f167",
+        measurementId: "G-K21EQ6X5ZM"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+</script>
+
+<!-- IMPORTAÇÃO DO ARQUIVO app.js -->
+<script src="app.js"></script>
+
+</html>
