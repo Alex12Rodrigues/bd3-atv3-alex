@@ -1,21 +1,33 @@
 body {
     font-family: 'Roboto', sans-serif;
-    background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+    background: linear-gradient(135deg, #74ebd5, #ACB6E5);
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     min-height: 100vh;
     overflow-y: auto;
+    animation: backgroundAnimation 10s infinite alternate;
+}
+
+@keyframes backgroundAnimation {
+    0% { background: linear-gradient(135deg, #74ebd5, #ACB6E5); }
+    100% { background: linear-gradient(135deg, #ACB6E5, #74ebd5); }
 }
 
 h1 {
-    text-align: center;
-    color: #fff;
+    text-align: left;
+    color: #000;
     font-size: 2.5rem;
     margin-bottom: 20px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    animation: titlePulse 3s ease-in-out infinite;
+}
+
+@keyframes titlePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
 .content {
@@ -81,13 +93,12 @@ button:active {
     transform: translateY(0);
 }
 
-/* Lista de alunos */
 ul {
     list-style-type: none;
     padding: 0;
     margin-top: 30px;
-    max-height: 300px; /* Altura máxima para lista de alunos */
-    overflow-y: auto; /* Rolagem para a lista */
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 li {
@@ -117,7 +128,6 @@ li span:first-child {
     color: #007bff;
 }
 
-/* Responsividade */
 @media (max-width: 768px) {
     .content {
         padding: 30px;

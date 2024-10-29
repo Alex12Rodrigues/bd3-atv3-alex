@@ -1,32 +1,26 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Alunos - FIREBASE</title>
-
     <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-
     <h1>Cadastro de Alunos - Firestore</h1>
     <div class="content">
         <form id="add-student-form">
             <input type="text" name="nome" placeholder="Nome completo" maxlength="100" required>
-            <input type="text" name="cpf" placeholder="CPF" maxlength="14" required>
-            <input type="text" name="rg" placeholder="RG" maxlength="12" required>
-            <input type="text" name="telefone_aluno" placeholder="Telefone do Aluno" maxlength="15" required>
-            <input type="text" name="telefone_responsavel" placeholder="Telefone do Responsável" maxlength="15">
+            <input type="text" name="cpf" placeholder="CPF" maxlength="14" required oninput="formatCPF(this)">
+            <input type="text" name="rg" placeholder="RG" maxlength="9" required>
+            <input type="text" name="telefone_aluno" placeholder="Telefone do Aluno" maxlength="15" required oninput="formatPhone(this)">
+            <input type="text" name="telefone_responsavel" placeholder="Telefone do Responsável" maxlength="15" oninput="formatPhone(this)">
             <input type="email" name="email" placeholder="Email" maxlength="100" required>
-            <input type="date" name="data_nascimento" placeholder="Data de Nascimento" required>
+            <input type="text" name="data_nascimento" placeholder="Data de Nascimento" maxlength="10" required oninput="formatDate(this)">
             <button>Cadastrar</button>
         </form>
         <ul id="student-list"></ul>
     </div>
-
 </body>
 
 <!-- SDK DO FIREBASE -->
@@ -47,9 +41,106 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+
+    const form = document.querySelector('#add-student-form');
+
+    // CPF
+    function formatCPF(input) {
+        let value = input.value.replace(/\D/g, '').substring(0, 11);
+        value = value.replace(/(\d{3})(\d)/, "$1.$2");
+        value = value.replace(/(\d{3})(\d)/, "$1.$2");
+        value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+        input.value = value;
+    }
+
+    // Data de Nascimento
+    function formatDate(input) {
+        let value = input.value.replace(/\D/g, '').substring(0, 8);
+        value = value.replace(/(\d{2})(\d)/, "$1/$2");
+        value = value.replace(/(\d{2})(\d)/, "$1/$2");
+        input.value = value;
+    }
+
+    // Telefone 
+    function formatPhone(input) {
+        let value = input.value.replace(/\D/g, '').substring(0, 11);
+        value = value.replace(/(\d{2})(\d)/, "($1) $2");
+        value = value.replace(/(\d{5})(\d)/, "$1-$2");
+        input.value = value;
+    }
+
+    // Limpar formatação para envio ao Firestore
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const nome = form.nome.value.trim();
+        const cpf = form.cpf.value.replace(/\D/g, '');  // Remover pontos e traços
+        const rg = form.rg.value.trim();
+        const telefoneAluno = form.telefone_aluno.value.replace(/\D/g, ''); // Remover formatação
+        const telefoneResponsavel = form.telefone_responsavel.value.replace(/\D/g, '') || 'N/A';
+        const email = form.email.value.trim();
+        const dataNascimento = form.data_nascimento.value.replace(/\D/g, '');  // Remover barras
+
+        db.collection('BD3-NoSQL-Firestore').add({
+            nome: nome,
+            cpf: cpf,
+            rg: rg,
+            telefone_aluno: telefoneAluno,
+            telefone_responsavel: telefoneResponsavel,
+            email: email,
+            data_nascimento: dataNascimento
+        }).then(() => {
+            renderStudent({
+                nome: nome,
+                cpf: cpf,
+                rg: rg,
+                telefone_aluno: telefoneAluno,
+                telefone_responsavel: telefoneResponsavel,
+                email: email,
+                data_nascimento: dataNascimento
+            });
+            form.reset();
+        }).catch(error => {
+            console.error("Erro ao adicionar aluno: ", error);
+        });
+    });
+
+    // Função para formatar e renderizar os dados dos alunos
+    const studentList = document.querySelector('#student-list');
+
+    function renderStudent(doc) {
+        // Formatação de CPF
+        const cpfFormatado = doc.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+
+        // Formatação de Telefone
+        const telefoneAlunoFormatado = doc.telefone_aluno.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+        const telefoneResponsavelFormatado = doc.telefone_responsavel.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+
+        // Formatação de Data de Nascimento
+        const dataNascimentoFormatada = doc.data_nascimento.replace(/(\d{2})(\d{2})(\d{4})/, "$1/$2/$3");
+
+        let li = document.createElement('li');
+        li.innerHTML = `
+            <strong>Nome:</strong> ${doc.nome} <br>
+            <strong>CPF:</strong> ${cpfFormatado} <br>
+            <strong>RG:</strong> ${doc.rg} <br>
+            <strong>Telefone Aluno:</strong> ${telefoneAlunoFormatado} <br>
+            <strong>Telefone Responsável:</strong> ${telefoneResponsavelFormatado} <br>
+            <strong>Email:</strong> ${doc.email} <br>
+            <strong>Data de Nascimento:</strong> ${dataNascimentoFormatada}
+        `;
+        studentList.appendChild(li);
+    }
+
+    // Listar dados ao carregar a página
+    window.addEventListener('DOMContentLoaded', () => {
+        db.collection('BD3-NoSQL-Firestore')
+            .get()
+            .then((snapshot) => {
+                snapshot.docs.forEach(doc => {
+                    renderStudent(doc.data());
+                });
+            });
+    });
 </script>
-
-<!-- IMPORTAÇÃO DO ARQUIVO app.js -->
-<script src="app.js"></script>
-
 </html>
